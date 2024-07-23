@@ -10,17 +10,19 @@ const App = () => {
     return null;
   }
 
-  const { todos, addTodo, updateTodo, deleteTodo } = todoContext;
+  const { todos, addTodo, updateTodo, deleteTodo, error, setError } = todoContext;
 
   return (
     <div className="flex items-center justify-center min-h-screen overflow-hidden">
       <div className="h-[400px] max-w-md mx-auto shadow-lg rounded-lg overflow-hidden">
-        <AddTodo addTodo={addTodo} />
+        <AddTodo addTodo={addTodo} error={error} setError={setError} />
         <div className="overflow-y-auto h-[calc(100%-3rem)] p-6">
           <TodoList
             todos={todos}
             deleteTodo={deleteTodo}
             updateTodo={updateTodo}
+            error={error}
+            setError={setError}
           />
         </div>
       </div>

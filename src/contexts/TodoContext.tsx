@@ -13,12 +13,15 @@ type TodoContextType = {
   addTodo: (title: string) => void;
   updateTodo: (id: number, updatedTodo: Todo) => void;
   deleteTodo: (id: number) => void;
+  error: boolean;
+  setError: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const TodoContext = createContext<TodoContextType | null>(null);
 
 export const TodoProvider = ({ children }: { children: ReactNode }) => {
   const [todos, setTodos] = useState<Todo[]>([]);
+  const [error, setError] = useState<boolean>(false);
 
   const getTodos = async () => {
     try {
@@ -33,6 +36,8 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
 
   const addTodo = async (title: string) => {
     try {
+      if (!title) return setError(true);
+
       const response = await axios.post(
         "https://jsonplaceholder.typicode.com/todos",
         {
@@ -42,7 +47,8 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
       );
       setTodos([response.data, ...todos]);
     } catch (error) {
-      console.error(error);
+      console.log(error);
+      setError(true);
     }
   };
 
@@ -54,7 +60,8 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
       );
       setTodos(todos.map((todo) => (todo.id === id ? response.data : todo)));
     } catch (error) {
-      console.error(error);
+      console.log(error);
+      setError(true);
     }
   };
 
@@ -63,7 +70,7 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
       await axios.delete(`https://jsonplaceholder.typicode.com/todos/${id}`);
       setTodos(todos.filter((todo) => todo.id !== id));
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };
 
@@ -77,6 +84,8 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
     addTodo,
     updateTodo,
     deleteTodo,
+    error,
+    setError,
   };
 
   return <TodoContext.Provider value={values}>{children}</TodoContext.Provider>;

@@ -6,9 +6,11 @@ type TodoListProps = {
   todos: Todo[];
   deleteTodo: (id: number) => void;
   updateTodo: (id: number, updatedTodo: Todo) => void;
+  error: boolean;
+  setError: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const TodoList = ({ todos, deleteTodo, updateTodo }: TodoListProps) => {
+const TodoList = ({ todos, deleteTodo, updateTodo, error, setError }: TodoListProps) => {
   const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
   const [newTitle, setNewTitle] = useState<string>("");
 
@@ -18,6 +20,8 @@ const TodoList = ({ todos, deleteTodo, updateTodo }: TodoListProps) => {
   };
 
   const handleSave = async (todo: Todo) => {
+    if (!newTitle) return setError(true);
+
     await updateTodo(todo.id, { ...todo, title: newTitle });
     setEditingTodoId(null);
   };
@@ -33,8 +37,11 @@ const TodoList = ({ todos, deleteTodo, updateTodo }: TodoListProps) => {
             <input
               type="text"
               value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              className="border border-gray-300 rounded p-2 flex-1"
+              onChange={(e) => {
+                setNewTitle(e.target.value);
+                setError(false);
+              }}
+              className={`${error ? 'border-red-500' : 'border-gray-300'} border rounded p-2 flex-1`}
             />
           ) : (
             <p
